@@ -31,9 +31,9 @@ class UsersController {
     const { name, email, password, old_password } = req.body;
     const { id } = req.params;
 
-    const user = await knex("users").where("id", id);
+    const user = await knex("users").where({ id }).first();
 
-    if (!user.length) {
+    if (!user) {
       throw new AppError("User not found");
     }
 
@@ -43,34 +43,34 @@ class UsersController {
       .where("email", "LIKE", `%${email}%`);
 
     const isEmailFromDiferentUser = userWithEmail.find(
-      (userEmail) => userEmail.email !== user[0].email
+      (userEmail) => userEmail.email !== user.email
     );
 
     if (isEmailFromDiferentUser) {
       throw new AppError("E-mail already exists");
     }
 
-    user[0].name = name;
-    user[0].email = email;
+    user.name = name;
+    user.email = email;
 
     if (password && !old_password) {
       throw new AppError("You need to put old password before new password");
     }
 
     if (password && old_password) {
-      const checkOldPassword = await compare(old_password, user[0].password);
+      const checkOldPassword = await compare(old_password, user.password);
 
       if (!checkOldPassword) {
         throw new AppError("Old password is wrong");
       }
 
-      user[0].password = await hash(password, 10);
+      user.password = await hash(password, 10);
     }
 
     await knex("users").where("id", id).update({
-      name: user[0].name,
-      email: user[0].email,
-      password: user[0].password,
+      name: user.name,
+      email: user.email,
+      password: user.password,
     });
 
     res.status(201).json();
