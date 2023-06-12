@@ -62,7 +62,7 @@ class UsersController {
 
       if (!checkOldPassword) {
         throw new AppError("Old password is wrong");
-      }
+      } 
 
       user.password = await hash(password, 10);
     }
