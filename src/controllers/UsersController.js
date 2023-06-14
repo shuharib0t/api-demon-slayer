@@ -24,7 +24,7 @@ class UsersController {
       password: hashedPassword,
     });
 
-    res.status(201).json();
+    return res.status(201).json();
   }
 
   async update(req, res) {
@@ -38,9 +38,9 @@ class UsersController {
     }
 
     const userWithEmail = await knex
-      .select("*")
-      .from("users")
-      .where("email", "LIKE", `%${email}%`);
+    .select("*")
+    .from("users")
+    .whereLike("email", `%${email}%`);
 
     const isEmailFromDiferentUser = userWithEmail.find(
       (userEmail) => userEmail.email !== user.email
@@ -73,7 +73,7 @@ class UsersController {
       password: user.password,
     });
 
-    res.status(201).json();
+    return res.status(201).json();
   }
 }
 
