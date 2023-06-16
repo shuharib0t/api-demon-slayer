@@ -13,7 +13,7 @@ class UsersController {
       .whereLike("email", `%${email}%`);
 
     if (checkEmail.length) {
-      throw new AppError("E-mail already exists");
+      throw new AppError("E-mail already exists.");
     }
 
     const hashedPassword = await hash(password, 10);
@@ -34,7 +34,7 @@ class UsersController {
     const user = await knex("users").where({ id: user_id }).first();
 
     if (!user) {
-      throw new AppError("User not found");
+      throw new AppError("User not found.");
     }
 
     const userWithEmail = await knex
@@ -47,21 +47,21 @@ class UsersController {
     );
 
     if (isEmailFromDiferentUser) {
-      throw new AppError("E-mail already exists");
+      throw new AppError("E-mail already exists.");
     }
 
     user.name = name;
     user.email = email;
 
     if (password && !old_password) {
-      throw new AppError("You need to put old password before new password");
+      throw new AppError("You need to put old password before new password.");
     }
 
     if (password && old_password) {
       const checkOldPassword = await compare(old_password, user.password);
 
       if (!checkOldPassword) {
-        throw new AppError("Old password is wrong");
+        throw new AppError("Old password is wrong.");
       } 
 
       user.password = await hash(password, 10);

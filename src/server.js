@@ -1,15 +1,16 @@
 require("express-async-errors");
+const cors = require("cors");
 const express = require("express");
 
 const database = require("./database/sqlite");
+const routes = require("./routes");
 const AppError = require("./utils/AppError");
 const uploadConfig = require("./configs/upload");
-
-const routes = require("./routes");
 
 database();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.use("/files", express.static(uploadConfig.UPLOAD_FOLDER));
@@ -33,4 +34,4 @@ app.use((error, req, res, next) => {
 });
 
 const PORT = 3000;
-app.listen(PORT, () => console.log(`Server is listening on ${PORT}`));
+app.listen(PORT, () => console.log(`Server is listening on ${PORT}`)); 
