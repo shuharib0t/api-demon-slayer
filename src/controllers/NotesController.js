@@ -1,13 +1,20 @@
 const knex = require("../database/knex");
+const AppError = require("../utils/AppError");
 
 class NotesController{
   async create(req, res) {
-    const { title, description, tags } = req.body;
+    const { name, age, gender, form, height, weight, description, tags, goals } = req.body;
     const user_id = req.user.id;
 
     const [note_id] = await knex("notes").insert({
-      title,
+      name,
+      age,
+      gender,
+      form,
+      height,
+      weight,
       description,
+      goals,
       user_id
     });
 
@@ -36,13 +43,17 @@ class NotesController{
   async delete(req, res) {
     const { id } = req.params;
 
-    await knex("notes").where({ id }).delete();
+    if (id > 7) {
+      await knex("notes").where({ id }).delete();
+    } else {
+      throw new AppError("You can't do this.");
+    }
 
     return res.status(201).json();
   }
 
   async index(req, res) {
-    const { title, tags } = req.query;
+    const { name, tags } = req.query;
 
     const user_id = req.user.id;
 
@@ -54,20 +65,20 @@ class NotesController{
       notes = await knex("tags")
         .select([
           "notes.id",
-          "notes.title",
+          "notes.name",
           "notes.user_id",
         ])
         .where("notes.user_id", user_id)
-        .whereLike("notes.title", `%${title}%`)
+        .whereLike("notes.name", `%${name}%`)
         .whereIn("tags.title", filterTags)
         .innerJoin("notes", "notes.id", "tags.note_id")
-        .orderBy("notes.title");
+        .orderBy("notes.name");
 
     } else {
       notes = await knex("notes")
         .where({ user_id })
-        .whereLike("title", `%${title}%`)
-        .orderBy("title");
+        .whereLike("name", `%${name}%`)
+        .orderBy("name");
     }
 
     const userTags = await knex("tags").where({ user_id });

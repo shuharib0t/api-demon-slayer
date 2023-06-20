@@ -1,7 +1,13 @@
 exports.up = knex => knex.schema.createTable("notes", table => {
   table.increments("id");
-  table.string("title");
+  table.string("name");
+  table.integer("age");
+  table.string("gender");
+  table.string("form");
+  table.integer("height");
+  table.integer("weight");
   table.string("description");
+  table.string("goals");
   table.integer("user_id").references("id").inTable("users");
 
   table.timestamp("created_at").default(knex.fn.now());
