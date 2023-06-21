@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError");
 
 class NotesController{
   async create(req, res) {
-    const { name, age, gender, form, height, weight, description, tags, goals } = req.body;
+    const { name, age, gender, form, height, weight, description, style, tags, goals } = req.body;
     const user_id = req.user.id;
 
     const [note_id] = await knex("notes").insert({
@@ -14,6 +14,7 @@ class NotesController{
       height,
       weight,
       description,
+      style,
       goals,
       user_id
     });
@@ -72,6 +73,7 @@ class NotesController{
         .whereLike("notes.name", `%${name}%`)
         .whereIn("tags.title", filterTags)
         .innerJoin("notes", "notes.id", "tags.note_id")
+        .groupBy("notes.id")
         .orderBy("notes.name");
 
     } else {
