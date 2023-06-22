@@ -1,10 +1,11 @@
-exports.up = knex => knex.schema.createTable("tags", table => {
+exports.up = knex => knex.schema.createTable("skills", table => {
   table.increments("id");
-  table.string("title").notNullable();
+  table.string("name").notNullable();
   
   table.integer("note_id").references("id").inTable("notes").onDelete("CASCADE");
   table.integer("user_id").references("id").inTable("users");
 }); 
 
 
-exports.down = knex => knex.schema.dropTable("tags");
+exports.down = knex => knex.schema.dropTable("skills");
+

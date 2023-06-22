@@ -3,7 +3,7 @@ const AppError = require("../utils/AppError");
 
 class NotesController{
   async create(req, res) {
-    const { name, age, gender, form, height, weight, description, style, tags, goals } = req.body;
+    const { name, age, gender, form, height, weight, description, style, skills, titles, goals } = req.body;
     const user_id = req.user.id;
 
     const [note_id] = await knex("notes").insert({
@@ -19,7 +19,17 @@ class NotesController{
       user_id
     });
 
-    const tagsInsert = tags.map(title => {
+    const skillsInsert = skills.map(name => {
+      return {
+        note_id,
+        name,
+        user_id
+      }
+    });
+
+    await knex("skills").insert(skillsInsert);
+
+    const titlesInsert = titles.map(title => {
       return {
         note_id,
         title,
@@ -27,7 +37,7 @@ class NotesController{
       }
     });
     
-    await knex("tags").insert(tagsInsert);
+    await knex("titles").insert(titlesInsert);
 
     return res.status(201).json();
   }
@@ -36,9 +46,10 @@ class NotesController{
     const { id } = req.params;
 
     const note = await knex("notes").where({ id }).first();
-    const tags = await knex("tags").where({ note_id: id }).orderBy("title");
+    const skills = await knex("skills").where({ note_id: id }).orderBy("name");
+    const titles = await knex("titles").where({ note_id: id }).orderBy("title");
 
-    return res.status(201).json({...note, tags});
+    return res.status(201).json({...note, skills, titles});
   }
 
   async delete(req, res) {
@@ -54,16 +65,16 @@ class NotesController{
   }
 
   async index(req, res) {
-    const { name, tags } = req.query;
+    const { name, titles } = req.query;
 
     const user_id = req.user.id;
 
     let notes;
 
-    if(tags) {
-      const filterTags = tags.split(',').map(tag => tag.trim());
+    if(titles) {
+      const filterTitles = titles.split(',').map(title => title.trim());
       
-      notes = await knex("tags")
+      notes = await knex("titles")
         .select([
           "notes.id",
           "notes.name",
@@ -71,8 +82,8 @@ class NotesController{
         ])
         .where("notes.user_id", user_id)
         .whereLike("notes.name", `%${name}%`)
-        .whereIn("tags.title", filterTags)
-        .innerJoin("notes", "notes.id", "tags.note_id")
+        .whereIn("titles.title", filterTitles)
+        .innerJoin("notes", "notes.id", "titles.note_id")
         .groupBy("notes.id")
         .orderBy("notes.name");
 
@@ -83,17 +94,17 @@ class NotesController{
         .orderBy("name");
     }
 
-    const userTags = await knex("tags").where({ user_id });
-    const noteWithTags = notes.map(note => {
-      const noteTags = userTags.filter(tag => tag.note_id === note.id);
+    const userTitles = await knex("titles").where({ user_id });
+    const noteWithTitles = notes.map(note => {
+      const noteTitles = userTitles.filter(title => title.note_id === note.id);
 
       return {
         ...note,
-        tags: noteTags,
+        titles: noteTitles,
       }
     })
 
-    return res.status(201).json(noteWithTags);
+    return res.status(201).json(noteWithTitles);
   }
 }
 

@@ -1,15 +1,15 @@
 const knex = require("../database/knex");
 
-class TagsController {
+class TitlesController {
   async index(req, res) {
     const user_id  = req.user.id;
 
-    const tags = await knex("tags")
+    const titles = await knex("titles")
       .where({ user_id })
       .groupBy("title");
 
-    return res.status(201).json(tags);
+    return res.status(201).json(titles);
   }
 }
 
-module.exports = TagsController;
+module.exports = TitlesController;
