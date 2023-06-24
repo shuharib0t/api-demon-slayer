@@ -39,7 +39,7 @@ class NotesController{
     
     await knex("titles").insert(titlesInsert);
 
-    return res.status(201).json();
+    return res.status(201).json({ id: note_id });
   }
 
   async show(req, res) {
@@ -55,7 +55,7 @@ class NotesController{
   async delete(req, res) {
     const { id } = req.params;
 
-    if (id > 7) {
+    if (id > 18) {
       await knex("notes").where({ id }).delete();
     } else {
       throw new AppError("You can't do this.");
@@ -104,7 +104,9 @@ class NotesController{
       }
     })
 
-    return res.status(201).json(noteWithTitles);
+    const updatedNotes = noteWithTitles.sort((a, b) => b.id - a.id);
+
+    return res.status(201).json(updatedNotes);
   }
 }
 
