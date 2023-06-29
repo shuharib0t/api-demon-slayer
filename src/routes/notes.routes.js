@@ -18,6 +18,10 @@ notesRoutes.post("/", notesController.create);
 notesRoutes.get("/", notesController.index);
 notesRoutes.get("/:id", notesController.show);
 notesRoutes.delete("/:id", notesController.delete);
-notesRoutes.patch("/avatar/:id", upload.single("avatar"), noteAvatarController.create);
+notesRoutes.patch(
+  "/avatar/:id",
+  upload.single("avatar"),
+  noteAvatarController.create
+);
 
 module.exports = notesRoutes;
