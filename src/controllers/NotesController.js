@@ -14,7 +14,6 @@ class NotesController {
       style,
       skills,
       titles,
-      goals,
     } = req.body;
 
     const user_id = req.user.id;
@@ -28,7 +27,6 @@ class NotesController {
       weight,
       description,
       style,
-      goals,
       user_id,
     });
 
@@ -59,7 +57,7 @@ class NotesController {
     const { id } = req.params;
 
     const note = await knex("notes").where({ id }).first();
-    const skills = await knex("skills").where({ note_id: id }).orderBy("name");
+    const skills = await knex("skills").where({ note_id: id }).orderBy("id");
     const titles = await knex("titles").where({ note_id: id }).orderBy("title");
 
     return res.status(201).json({ ...note, skills, titles });
@@ -68,7 +66,7 @@ class NotesController {
   async delete(req, res) {
     const { id } = req.params;
 
-    if (id > 18) {
+    if (id > 50) {
       await knex("notes").where({ id }).delete();
     } else {
       throw new AppError("You can't do this.");
