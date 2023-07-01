@@ -15,6 +15,7 @@ const upload = multer(uploadConfig.MULTER);
 notesRoutes.use(ensureAuthenticated);
 
 notesRoutes.post("/", notesController.create);
+notesRoutes.put("/:id", notesController.update);
 notesRoutes.get("/", notesController.index);
 notesRoutes.get("/:id", notesController.show);
 notesRoutes.delete("/:id", notesController.delete);

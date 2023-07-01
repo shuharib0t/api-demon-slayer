@@ -53,12 +53,56 @@ class NotesController {
     return res.status(201).json({ id: note_id });
   }
 
+  async update(req, res) {
+    const {
+      name,
+      age,
+      gender,
+      form,
+      height,
+      weight,
+      description,
+      style,
+      skills,
+      titles,
+    } = req.body;
+
+    const [note_id] = await knex("notes").update({
+      name,
+      age,
+      gender,
+      form,
+      height,
+      weight,
+      description,
+      style,
+    });
+
+    const skillsUpdate = skills.map((name) => {
+      return {
+        name,
+      };
+    });
+
+    await knex("skills").update(skillsUpdate);
+
+    const titlesUpdate = titles.map((title) => {
+      return {
+        title,
+      };
+    });
+
+    await knex("titles").insert(titlesUpdate);
+
+    return res.status(201).json({ id: note_id });
+  }
+
   async show(req, res) {
     const { id } = req.params;
 
     const note = await knex("notes").where({ id }).first();
     const skills = await knex("skills").where({ note_id: id }).orderBy("id");
-    const titles = await knex("titles").where({ note_id: id }).orderBy("title");
+    const titles = await knex("titles").where({ note_id: id });
 
     return res.status(201).json({ ...note, skills, titles });
   }
@@ -111,7 +155,7 @@ class NotesController {
       };
     });
 
-    const updatedNotes = noteWithTitles.sort((a, b) => b.id - a.id);
+    const updatedNotes = noteWithTitles.sort((a, b) => a.id - b.id);
 
     return res.status(201).json(updatedNotes);
   }
