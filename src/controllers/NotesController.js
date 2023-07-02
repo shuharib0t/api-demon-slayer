@@ -110,7 +110,7 @@ class NotesController {
   async delete(req, res) {
     const { id } = req.params;
 
-    if (id > 50) {
+    if (id > 39) {
       await knex("notes").where({ id }).delete();
     } else {
       throw new AppError("You can't do this.");

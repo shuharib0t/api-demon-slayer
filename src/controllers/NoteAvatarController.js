@@ -13,7 +13,7 @@ class NoteAvatarController {
     const note = await knex("notes").where({ id: note_id }).first();
 
     if (!note) {
-      throw new AppError("teste", 401);
+      throw new AppError("test", 401);
     }
 
     if(note.avatar) {
