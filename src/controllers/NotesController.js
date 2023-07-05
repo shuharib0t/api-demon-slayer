@@ -143,15 +143,12 @@ class NotesController {
   async index(req, res) {
     const { name, titles } = req.query;
 
-    const user_id = req.user.id;
-
     let notes;
 
     if (titles) {
       const filterTitles = titles.split(",").map((title) => title.trim());
 
       notes = await knex("titles")
-        .where("notes.user_id", user_id)
         .whereLike("notes.name", `%${name}%`)
         .whereIn("titles.title", filterTitles)
         .innerJoin("notes", "notes.id", "titles.note_id")
@@ -159,12 +156,11 @@ class NotesController {
         .orderBy("notes.name");
     } else {
       notes = await knex("notes")
-        .where({ user_id })
         .whereLike("name", `%${name}%`)
         .orderBy("name");
     }
 
-    const userTitles = await knex("titles").where({ user_id });
+    const userTitles = await knex("titles");
     const noteWithTitles = notes.map((note) => {
       const noteTitles = userTitles.filter(
         (title) => title.note_id === note.id
