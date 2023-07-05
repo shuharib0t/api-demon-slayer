@@ -1,4 +1,6 @@
 require("express-async-errors");
+require("dotenv/config");
+
 const cors = require("cors");
 const express = require("express");
 
@@ -33,5 +35,5 @@ app.use((error, req, res, next) => {
   });
 });
 
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Server is listening on ${PORT}`)); 
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server is listening on ${PORT}`));

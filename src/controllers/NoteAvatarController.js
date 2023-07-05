@@ -12,21 +12,18 @@ class NoteAvatarController {
 
     const note = await knex("notes").where({ id: note_id }).first();
 
-    if (!note) {
-      throw new AppError("test", 401);
-    }
-
-    if(note.avatar) {
+    if (note.avatar) {
       await diskStorage.deleteFile(note.avatar);
     }
 
     const filename = await diskStorage.saveFile(avatarFileName);
+
     note.avatar = filename;
 
     await knex("notes").update(note).where({ id: note_id });
 
-    return res.status(201).json(note)
-  } 
+    return res.status(201).json(note);
+  }
 }
 
 module.exports = NoteAvatarController;

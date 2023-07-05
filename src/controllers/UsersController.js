@@ -38,9 +38,9 @@ class UsersController {
     }
 
     const userWithEmail = await knex
-    .select("*")
-    .from("users")
-    .whereLike("email", `%${email}%`);
+      .select("*")
+      .from("users")
+      .whereLike("email", `%${email}%`);
 
     const isEmailFromDiferentUser = userWithEmail.find(
       (userEmail) => userEmail.email !== user.email
@@ -62,12 +62,12 @@ class UsersController {
 
       if (!checkOldPassword) {
         throw new AppError("Old password is wrong.");
-      } 
+      }
 
       user.password = await hash(password, 10);
     }
 
-    await knex("users").where({ id: user_id  }).update({
+    await knex("users").where({ id: user_id }).update({
       name: user.name,
       email: user.email,
       password: user.password,

@@ -67,34 +67,55 @@ class NotesController {
       titles,
     } = req.body;
 
-    const [note_id] = await knex("notes").update({
-      name,
-      age,
-      gender,
-      form,
-      height,
-      weight,
-      description,
-      style,
-    });
+    const { id } = req.params;
 
-    const skillsUpdate = skills.map((name) => {
+    const note = await knex("/notes").where({ id }).first();
+
+    if (!note) {
+      throw new AppError("Character not found.");
+    }
+
+    note.name = name;
+    note.age = age;
+    note.gender = gender;
+    note.form = form;
+    note.height = height;
+    note.weight = weight;
+    note.description = description;
+    note.style = style;
+
+    const skillsInsert = skills.map((name) => {
       return {
         name,
       };
     });
 
-    await knex("skills").update(skillsUpdate);
+    await knex("skills").update(skillsInsert);
 
-    const titlesUpdate = titles.map((title) => {
+    note.skills = skills;
+
+    const titlesInsert = titles.map((title) => {
       return {
         title,
       };
     });
 
-    await knex("titles").insert(titlesUpdate);
+    await knex("titles").update(titlesInsert);
 
-    return res.status(201).json({ id: note_id });
+    note.titles = titles;
+
+    return res.status(201).json({ id: note_id }).update({
+      name: note.name,
+      age: note.age,
+      gender: note.gender,
+      form: note.form,
+      height: note.height,
+      weight: note.weight,
+      description: note.description,
+      style: note.style,
+      skills: note.skills,
+      titles: note.titles,
+    });
   }
 
   async show(req, res) {
