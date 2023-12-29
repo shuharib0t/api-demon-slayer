@@ -14,8 +14,10 @@ class UserCreateService {
       throw new AppError("E-mail already exists.");
     }
 
-    if (!Array.isArray(checkEmail)) {
-      throw new AppError("test");
+    const regexEmail = new RegExp("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
+
+    if (!regexEmail.test(email)) {
+      throw new AppError("Please enter a valid e-mail.", 401);
     }
 
     const hashedPassword = await hash(password, 10);

@@ -1,9 +1,6 @@
-const { hash, compare } = require("bcryptjs");
-
-const knex = require("../database/knex");
-const AppError = require("../utils/AppError");
 const UserRepository = require("../repositories/UserRepository");
 const UserCreateService = require("../services/UserCreateService");
+const UserUpdateService = require("../services/UserUpdateService");
 
 class UsersController {
   async create(req, res) {
@@ -21,49 +18,18 @@ class UsersController {
     const { name, email, password, old_password } = req.body;
     const user_id = req.user.id;
 
-    const user = await knex("users").where({ id: user_id }).first();
+    const userRepository = new UserRepository();
+    const userUpdateService = new UserUpdateService(userRepository);
 
-    if (!user) {
-      throw new AppError("User not found.");
-    }
-
-    const userWithEmail = await knex
-      .select("*")
-      .from("users")
-      .whereLike("email", `%${email}%`);
-
-    const isEmailFromDiferentUser = userWithEmail.find(
-      (userEmail) => userEmail.email !== user.email
-    );
-
-    if (isEmailFromDiferentUser) {
-      throw new AppError("E-mail already exists.");
-    }
-
-    user.name = name;
-    user.email = email;
-
-    if (password && !old_password) {
-      throw new AppError("You need to put old password before new password.");
-    }
-
-    if (password && old_password) {
-      const checkOldPassword = await compare(old_password, user.password);
-
-      if (!checkOldPassword) {
-        throw new AppError("Old password is wrong.");
-      }
-
-      user.password = await hash(password, 10);
-    }
-
-    await knex("users").where({ id: user_id }).update({
-      name: user.name,
-      email: user.email,
-      password: user.password,
+    const updatedUser = await userUpdateService.execute({
+      id: user_id,
+      name,
+      email,
+      password,
+      old_password,
     });
 
-    return res.status(201).json();
+    return res.json(updatedUser);
   }
 }
 

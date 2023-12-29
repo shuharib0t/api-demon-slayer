@@ -63,18 +63,6 @@ class NotesController {
     return res.status(201).json({ ...note, skills, titles });
   }
 
-  async delete(req, res) {
-    const { id } = req.params;
-
-    if (id > 39) {
-      await knex("notes").where({ id }).delete();
-    } else {
-      throw new AppError("You can't do this.");
-    }
-
-    return res.status(201).json();
-  }
-
   async index(req, res) {
     const { name, titles } = req.query;
 
