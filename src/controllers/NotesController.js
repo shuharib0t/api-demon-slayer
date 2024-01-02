@@ -1,5 +1,14 @@
-const knex = require("../database/knex");
-const AppError = require("../utils/AppError");
+const NoteRepository = require("../repositories/NoteRepository");
+const SkillRepository = require("../repositories/SkillRepository");
+const TitleRepository = require("../repositories/TitleRepository");
+
+const NoteCreateService = require("../services/NoteCreateService");
+const NoteShowService = require("../services/NoteShowService");
+const NoteIndexService = require("../services/NoteIndexService");
+
+const noteRepository = new NoteRepository();
+const skillRepository = new SkillRepository();
+const titleRepository = new TitleRepository();
 
 class NotesController {
   async create(req, res) {
@@ -18,7 +27,13 @@ class NotesController {
 
     const user_id = req.user.id;
 
-    const [note_id] = await knex("notes").insert({
+    const noteCreateService = new NoteCreateService(
+      noteRepository,
+      skillRepository,
+      titleRepository
+    );
+
+    const result = await noteCreateService.execute({
       name,
       age,
       gender,
@@ -28,76 +43,37 @@ class NotesController {
       description,
       style,
       user_id,
+      skills,
+      titles,
     });
 
-    const skillsInsert = skills.map((name) => {
-      return {
-        note_id,
-        name,
-        user_id,
-      };
-    });
-
-    await knex("skills").insert(skillsInsert);
-
-    const titlesInsert = titles.map((title) => {
-      return {
-        note_id,
-        title,
-        user_id,
-      };
-    });
-
-    await knex("titles").insert(titlesInsert);
-
-    return res.status(201).json({ id: note_id });
+    return res.status(201).json(result);
   }
 
   async show(req, res) {
     const { id } = req.params;
 
-    const note = await knex("notes").where({ id }).first();
-    const skills = await knex("skills").where({ note_id: id }).orderBy("id");
-    const titles = await knex("titles").where({ note_id: id });
+    const noteShowService = new NoteShowService(
+      noteRepository,
+      skillRepository,
+      titleRepository
+    );
 
-    return res.status(201).json({ ...note, skills, titles });
+    const result = await noteShowService.execute(id);
+    return res.status(200).json(result);
   }
 
   async index(req, res) {
     const { name, titles } = req.query;
 
-    let notes;
+    const noteIndexService = new NoteIndexService(
+      noteRepository,
+      skillRepository,
+      titleRepository
+    );
 
-    if (titles) {
-      const filterTitles = titles.split(",").map((title) => title.trim());
-
-      notes = await knex("titles")
-        .whereLike("notes.name", `%${name}%`)
-        .whereIn("titles.title", filterTitles)
-        .innerJoin("notes", "notes.id", "titles.note_id")
-        .groupBy("notes.id")
-        .orderBy("notes.name");
-    } else {
-      notes = await knex("notes")
-        .whereLike("name", `%${name}%`)
-        .orderBy("name");
-    }
-
-    const userTitles = await knex("titles");
-    const noteWithTitles = notes.map((note) => {
-      const noteTitles = userTitles.filter(
-        (title) => title.note_id === note.id
-      );
-
-      return {
-        ...note,
-        titles: noteTitles,
-      };
-    });
-
-    const updatedNotes = noteWithTitles.sort((a, b) => a.id - b.id);
-
-    return res.status(201).json(updatedNotes);
+    const result = await noteIndexService.execute({ name, titles });
+    return res.status(200).json(result);
   }
 }
 
