@@ -1,14 +1,14 @@
-const NoteRepository = require("../repositories/NoteRepository");
-const SkillRepository = require("../repositories/SkillRepository");
-const TitleRepository = require("../repositories/TitleRepository");
+const NotesRepository = require("../repositories/NotesRepository");
+const SkillsRepository = require("../repositories/SkillsRepository");
+const TitlesRepository = require("../repositories/TitlesRepository");
 
 const NoteCreateService = require("../services/NoteCreateService");
 const NoteShowService = require("../services/NoteShowService");
 const NoteIndexService = require("../services/NoteIndexService");
 
-const noteRepository = new NoteRepository();
-const skillRepository = new SkillRepository();
-const titleRepository = new TitleRepository();
+const noteRepository = new NotesRepository();
+const skillRepository = new SkillsRepository();
+const titleRepository = new TitlesRepository();
 
 class NotesController {
   async create(req, res) {

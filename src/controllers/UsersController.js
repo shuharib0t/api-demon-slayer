@@ -1,4 +1,4 @@
-const UserRepository = require("../repositories/UserRepository");
+const UsersRepository = require("../repositories/UsersRepository");
 const UserCreateService = require("../services/UserCreateService");
 const UserUpdateService = require("../services/UserUpdateService");
 
@@ -6,7 +6,7 @@ class UsersController {
   async create(req, res) {
     const { name, email, password } = req.body;
 
-    const userRepository = new UserRepository();
+    const userRepository = new UsersRepository();
     const userCreateService = new UserCreateService(userRepository);
 
     await userCreateService.execute({ name, email, password });
@@ -18,7 +18,7 @@ class UsersController {
     const { name, email, password, old_password } = req.body;
     const user_id = req.user.id;
 
-    const userRepository = new UserRepository();
+    const userRepository = new UsersRepository();
     const userUpdateService = new UserUpdateService(userRepository);
 
     const updatedUser = await userUpdateService.execute({
